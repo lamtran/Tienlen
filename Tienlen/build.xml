@@ -6,7 +6,14 @@
      It contains the path to the SDK. It should *NOT* be checked into
      Version Control Systems. -->
     <property file="local.properties" />
-
+    <property environment="env"/>
+	<taskdef resource="org/eclipse/jgit/ant/ant-tasks.properties">
+		<classpath>
+    		<pathelement location="/home/lam/jars/org.eclipse.jgit.ant-1.0.99.0.6-UNOFFICIAL-ROBERTO-RELEASE.jar"/>
+    		<pathelement location="/home/lam/jars/org.eclipse.jgit-1.1.0.201109151100-r.jar"/>
+    		<pathelement location="/home/lam/jars/jsch-0.1.4jsch-0.1.44-1.jar"/>
+		</classpath>
+	</taskdef>
     <!-- The build.properties file can be created by you and is never touched
          by the 'android' tool. This is the place to change some of the
          default property values used by the Ant rules.
@@ -40,18 +47,10 @@
 <!-- extension targets. Uncomment the ones where you want to do custom work
      in between standard targets -->
 <!--
-    <target name="-pre-build">
-    </target>
-    <target name="-pre-compile">
-    </target>
-
     [This is typically used for code obfuscation.
      Compiled code location: ${out.classes.absolute.dir}
      If this is not done in place, override ${out.dex.input.absolute.dir}]
-    <target name="-post-compile">
-    </target>
 -->
-
     <!-- Execute the Android Setup task that will setup some properties
          specific to the target, and import the build rules files.
 
@@ -75,5 +74,32 @@
              - customize to your needs.
     -->
     <setup />
-
+    <target name="-pre-build">
+    </target>
+    <target name="-pre-compile">
+    	<echo message="pre compile" />
+    	<echo>updating manifest version with ${env.RHAPSODY_VERSION}</echo>
+		<replaceregexp file="AndroidManifest.xml" match="android:versionName=&quot;.*?&quot;"
+			replace="android:versionName=&quot;${env.RHAPSODY_VERSION}&quot;" />
+    </target>
+    <target name="-post-compile">
+    	<echo message="post compile" />
+		<!--// UPDATE BUILD NOTES // -->
+		<echo>updating build notes...</echo>
+		<delete file="moved" />
+		<!-- <svn> <update file="soundwave.buildnotes.txt" /> </svn> -->
+		<move file="buildnotes.txt" tofile="moved" />
+		<tstamp>
+			<format property="taday" pattern="M-dd-yyy HH:mm:ss" />
+		</tstamp>
+		<!-- <svn> <status path="${basedir}" revisionProperty="revision"/> </svn> -->
+		<concat destfile="buildnotes.txt">
+			<header filtering="no" trimleading="yes">
+				${env.JOB_NAME}: Build for ${env.RHAPSODY_VERSION} was SUCCESSFUL (PASS) at
+				${taday}
+				========
+				</header>
+			<path path="moved" />
+		</concat>
+    </target>
 </project>
