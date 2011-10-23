@@ -6,6 +6,7 @@
      It contains the path to the SDK. It should *NOT* be checked into
      Version Control Systems. -->
     <property file="local.properties" />
+    <property environment="env"/>
 	<taskdef resource="org/eclipse/jgit/ant/ant-tasks.properties">
 		<classpath>
     		<pathelement location="/home/lam/jars/org.eclipse.jgit.ant-1.0.99.0.6-UNOFFICIAL-ROBERTO-RELEASE.jar"/>
